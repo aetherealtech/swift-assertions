@@ -1,1 +1,3 @@
-# swift-assertions
+# CoreExtensions
+
+A description of this package.
