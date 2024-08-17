@@ -20,6 +20,44 @@ public func assert(
     }
 }
 
+public func assertTrue(
+    _ value: Bool,
+    _ message: @autoclosure () -> String? = nil
+) throws {
+    try assert(value, {
+        message() ?? "Expression is not true"
+    }())
+}
+
+public func assertTrue(
+    _ expression: () throws -> Bool,
+    _ message: @autoclosure () -> String? = nil
+) throws {
+    try assertTrue(
+        expression(),
+        message()
+    )
+}
+
+public func assertFalse(
+    _ value: Bool,
+    _ message: @autoclosure () -> String? = nil
+) throws {
+    try assert(!value, {
+        message() ?? "Expression is not false"
+    }())
+}
+
+public func assertFalse(
+    _ expression: () throws -> Bool,
+    _ message: @autoclosure () -> String? = nil
+) throws {
+    try assertFalse(
+        expression(),
+        message()
+    )
+}
+
 public func assertEqual<T: Equatable>(
     _ value1: T,
     _ value2: T,
@@ -109,44 +147,6 @@ public func assertEqual<T: Numeric>(
         expression1(),
         expression2(),
         accuracy: accuracy,
-        message()
-    )
-}
-
-public func assertTrue(
-    _ value: Bool,
-    _ message: @autoclosure () -> String? = nil
-) throws {
-    try assert(!value, {
-        message() ?? "Expression is not true"
-    }())
-}
-
-public func assertTrue(
-    _ expression: () throws -> Bool,
-    _ message: @autoclosure () -> String? = nil
-) throws {
-    try assertTrue(
-        expression(),
-        message()
-    )
-}
-
-public func assertFalse(
-    _ value: Bool,
-    _ message: @autoclosure () -> String? = nil
-) throws {
-    try assert(!value, {
-        message() ?? "Expression is not false"
-    }())
-}
-
-public func assertFalse(
-    _ expression: () throws -> Bool,
-    _ message: @autoclosure () -> String? = nil
-) throws {
-    try assertFalse(
-        expression(),
         message()
     )
 }
