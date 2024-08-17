@@ -113,13 +113,42 @@ public func assertEqual<T: Numeric>(
     )
 }
 
-public func assertFalse(
-    _ expression: @autoclosure () throws -> Bool,
+public func assertTrue(
+    _ value: Bool,
     _ message: @autoclosure () -> String? = nil
 ) throws {
-    try assert(!expression(), {
+    try assert(!value, {
+        message() ?? "Expression is not true"
+    }())
+}
+
+public func assertTrue(
+    _ expression: () throws -> Bool,
+    _ message: @autoclosure () -> String? = nil
+) throws {
+    try assertTrue(
+        expression(),
+        message()
+    )
+}
+
+public func assertFalse(
+    _ value: Bool,
+    _ message: @autoclosure () -> String? = nil
+) throws {
+    try assert(!value, {
         message() ?? "Expression is not false"
     }())
+}
+
+public func assertFalse(
+    _ expression: () throws -> Bool,
+    _ message: @autoclosure () -> String? = nil
+) throws {
+    try assertFalse(
+        expression(),
+        message()
+    )
 }
 
 public func assertGreaterThan<T: Comparable>(
@@ -434,11 +463,3 @@ public func assertThrowsError<T, E: Error & Equatable>(
     }
 }
 
-public func assertTrue(
-    _ expression: @autoclosure () throws -> Bool,
-    _ message: @autoclosure () -> String? = nil
-) throws {
-    try assert(expression(), {
-        message() ?? "Expression is not true"
-    }())
-}
