@@ -414,7 +414,7 @@ public func assertNotNil(
 }
 
 public func assertThrowsError<T>(
-    _ expression: @autoclosure () throws -> T,
+    _ expression: () throws -> T,
     _ message: @autoclosure () -> String? = nil,
     _ errorHandler: (_ error: Error) throws -> Void = { _ in }
 ) throws {
@@ -430,10 +430,10 @@ public func assertThrowsError<T>(
 
 public func assertThrowsError<T, E: Error & Equatable>(
     expectedError: E,
-    _ expression: @autoclosure () throws -> T,
+    _ expression: () throws -> T,
     _ message: @autoclosure () -> String? = nil
 ) throws {
-    try assertThrowsError(try expression(), message()) { error in
+    try assertThrowsError(expression, message()) { error in
         try assertEqual(error as? E, expectedError)
     }
 }
