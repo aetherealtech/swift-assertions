@@ -402,4 +402,222 @@ final class AssertionsTests: XCTestCase {
             XCTAssertEqual(testError, error)
         }
     }
+    
+    func testAssertApproximatelyEqualFloat() throws {
+        do {
+            try assertEqual(4.0, 4.0, accuracy: 1.0)
+        } catch {
+            XCTFail("Did not expect a throw")
+            return
+        }
+        
+        do {
+            try assertEqual(4.0, 6.0, accuracy: 1.0)
+            XCTFail("Expected a throw")
+        } catch {
+            guard let error = error as? Fail else {
+                XCTFail("Expected a `Fail` error")
+                return
+            }
+            
+            XCTAssertEqual("""
+            Values are not approximately equal
+
+            4.0 != 6.0 +/- 1.0
+            """, error.debugDescription)
+        }
+        
+        let testMessage = "Test Message"
+        
+        do {
+            try assertEqual(
+                4.0, 6.0, accuracy: 1.0,
+                { testMessage }()
+            )
+            XCTFail("Expected a throw")
+        } catch {
+            guard let error = error as? Fail else {
+                XCTFail("Expected a `Fail` error")
+                return
+            }
+            
+            XCTAssertEqual("""
+            \(testMessage)
+            
+            4.0 != 6.0 +/- 1.0
+            """, error.debugDescription)
+        }
+    }
+    
+    func testAssertApproximatelyEqualFloatExpression() throws {
+        do {
+            try assertEqual({ 4.0 }, { 4.0 }, accuracy: 1.0)
+        } catch {
+            XCTFail("Did not expect a throw")
+            return
+        }
+        
+        do {
+            try assertEqual({ 4.0 }, { 6.0 }, accuracy: 1.0)
+            XCTFail("Expected a throw")
+        } catch {
+            guard let error = error as? Fail else {
+                XCTFail("Expected a `Fail` error")
+                return
+            }
+            
+            XCTAssertEqual("""
+            Values are not approximately equal
+
+            4.0 != 6.0 +/- 1.0
+            """, error.debugDescription)
+        }
+        
+        let testMessage = "Test Message"
+        
+        do {
+            try assertEqual(
+                { 4.0 }, { 6.0 }, accuracy: 1.0,
+                { testMessage }()
+            )
+            XCTFail("Expected a throw")
+        } catch {
+            guard let error = error as? Fail else {
+                XCTFail("Expected a `Fail` error")
+                return
+            }
+            
+            XCTAssertEqual("""
+            \(testMessage)
+            
+            4.0 != 6.0 +/- 1.0
+            """, error.debugDescription)
+        }
+        
+        let testError = TestError()
+        
+        do {
+            try assertEqual(
+                { 4.0 }, { throw testError }, accuracy: 1.0,
+                { testMessage }()
+            )
+            XCTFail("Expected a throw")
+        } catch {
+            guard let error = error as? TestError else {
+                XCTFail("Expected a `Fail` error")
+                return
+            }
+            
+            XCTAssertEqual(testError, error)
+        }
+    }
+    
+    func testAssertApproximatelyEqualNumeric() throws {
+        do {
+            try assertEqual(4, 4, accuracy: 1)
+        } catch {
+            XCTFail("Did not expect a throw")
+            return
+        }
+        
+        do {
+            try assertEqual(4, 6, accuracy: 1)
+            XCTFail("Expected a throw")
+        } catch {
+            guard let error = error as? Fail else {
+                XCTFail("Expected a `Fail` error")
+                return
+            }
+            
+            XCTAssertEqual("""
+            Values are not approximately equal
+
+            4 != 6 +/- 1
+            """, error.debugDescription)
+        }
+        
+        let testMessage = "Test Message"
+        
+        do {
+            try assertEqual(
+                4, 6, accuracy: 1,
+                { testMessage }()
+            )
+            XCTFail("Expected a throw")
+        } catch {
+            guard let error = error as? Fail else {
+                XCTFail("Expected a `Fail` error")
+                return
+            }
+            
+            XCTAssertEqual("""
+            \(testMessage)
+            
+            4 != 6 +/- 1
+            """, error.debugDescription)
+        }
+    }
+    
+    func testAssertApproximatelyEqualNumericExpression() throws {
+        do {
+            try assertEqual({ 4 }, { 4 }, accuracy: 1)
+        } catch {
+            XCTFail("Did not expect a throw")
+            return
+        }
+        
+        do {
+            try assertEqual({ 4 }, { 6 }, accuracy: 1)
+            XCTFail("Expected a throw")
+        } catch {
+            guard let error = error as? Fail else {
+                XCTFail("Expected a `Fail` error")
+                return
+            }
+            
+            XCTAssertEqual("""
+            Values are not approximately equal
+
+            4 != 6 +/- 1
+            """, error.debugDescription)
+        }
+        
+        let testMessage = "Test Message"
+        
+        do {
+            try assertEqual(
+                { 4 }, { 6 }, accuracy: 1,
+                { testMessage }()
+            )
+            XCTFail("Expected a throw")
+        } catch {
+            guard let error = error as? Fail else {
+                XCTFail("Expected a `Fail` error")
+                return
+            }
+            
+            XCTAssertEqual("""
+            \(testMessage)
+            
+            4 != 6 +/- 1
+            """, error.debugDescription)
+        }
+        
+        let testError = TestError()
+        
+        do {
+            try assertEqual(
+                { 4 }, { throw testError }, accuracy: 1,
+                { testMessage }()
+            )
+            XCTFail("Expected a throw")
+        } catch {
+            guard let error = error as? TestError else {
+                XCTFail("Expected a `Fail` error")
+                return
+            }
+            
+            XCTAssertEqual(testError, error)
+        }
+    }
 }
