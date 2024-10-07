@@ -178,7 +178,7 @@ public func assertGreaterThanOrEqual<T: Comparable>(
     _ value2: T,
     _ message: @autoclosure () -> String? = nil
 ) throws {
-    try assert(value1 > value2, {
+    try assert(value1 >= value2, {
         message() ?? "\(value1) is not greater than or equal to \(value2)"
     }())
 }
@@ -189,6 +189,50 @@ public func assertGreaterThanOrEqual<T: Comparable>(
     _ message: @autoclosure () -> String? = nil
 ) throws {
     try assertGreaterThanOrEqual(
+        expression1(),
+        expression2(),
+        message()
+    )
+}
+
+public func assertLessThan<T: Comparable>(
+    _ value1: T,
+    _ value2: T,
+    _ message: @autoclosure () -> String? = nil
+) throws {
+    try assert(value1 < value2, {
+        message() ?? "\(value1) is not less than \(value2)"
+    }())
+}
+
+public func assertLessThan<T: Comparable>(
+    _ expression1: () throws -> T,
+    _ expression2: () throws -> T,
+    _ message: @autoclosure () -> String? = nil
+) throws {
+    try assertLessThan(
+        expression1(),
+        expression2(),
+        message()
+    )
+}
+
+public func assertLessThanOrEqual<T: Comparable>(
+    _ value1: T,
+    _ value2: T,
+    _ message: @autoclosure () -> String? = nil
+) throws {
+    try assert(value1 <= value2, {
+        message() ?? "\(value1) is not less than or equal to \(value2)"
+    }())
+}
+
+public func assertLessThanOrEqual<T: Comparable>(
+    _ expression1: () throws -> T,
+    _ expression2: () throws -> T,
+    _ message: @autoclosure () -> String? = nil
+) throws {
+    try assertLessThanOrEqual(
         expression1(),
         expression2(),
         message()
@@ -211,50 +255,6 @@ public func assertIdentical(
     _ message: @autoclosure () -> String? = nil
 ) throws {
     try assertIdentical(
-        expression1(),
-        expression2(),
-        message()
-    )
-}
-
-public func assertLessThan<T: Comparable>(
-    _ value1: T,
-    _ value2: T,
-    _ message: @autoclosure () -> String? = nil
-) throws {
-    try assert(value1 < value2, {
-        message() ?? "\(value1) is not greater than \(value2)"
-    }())
-}
-
-public func assertLessThan<T: Comparable>(
-    _ expression1: () throws -> T,
-    _ expression2: () throws -> T,
-    _ message: @autoclosure () -> String? = nil
-) throws {
-    try assertLessThan(
-        expression1(),
-        expression2(),
-        message()
-    )
-}
-
-public func assertLessThanOrEqual<T: Comparable>(
-    _ value1: T,
-    _ value2: T,
-    _ message: @autoclosure () -> String? = nil
-) throws {
-    try assert(value1 <= value2, {
-        message() ?? "\(value1) is not greater than or equal to \(value2)"
-    }())
-}
-
-public func assertLessThanOrEqual<T: Comparable>(
-    _ expression1: () throws -> T,
-    _ expression2: () throws -> T,
-    _ message: @autoclosure () -> String? = nil
-) throws {
-    try assertLessThanOrEqual(
         expression1(),
         expression2(),
         message()

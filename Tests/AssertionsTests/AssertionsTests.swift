@@ -620,4 +620,452 @@ final class AssertionsTests: XCTestCase {
             XCTAssertEqual(testError, error)
         }
     }
+    
+    func testAssertGreaterThan() throws {
+        do {
+            try assertGreaterThan(5, 4)
+        } catch {
+            XCTFail("Did not expect a throw")
+            return
+        }
+        
+        do {
+            try assertGreaterThan(4, 5)
+            XCTFail("Expected a throw")
+        } catch {
+            guard let error = error as? Fail else {
+                XCTFail("Expected a `Fail` error")
+                return
+            }
+            
+            XCTAssertEqual("4 is not greater than 5", error.debugDescription)
+        }
+        
+        do {
+            try assertGreaterThan(4, 4)
+            XCTFail("Expected a throw")
+        } catch {
+            guard let error = error as? Fail else {
+                XCTFail("Expected a `Fail` error")
+                return
+            }
+            
+            XCTAssertEqual("4 is not greater than 4", error.debugDescription)
+        }
+        
+        let testMessage = "Test Message"
+        
+        do {
+            try assertGreaterThan(
+                4, 5,
+                { testMessage }()
+            )
+            XCTFail("Expected a throw")
+        } catch {
+            guard let error = error as? Fail else {
+                XCTFail("Expected a `Fail` error")
+                return
+            }
+            
+            XCTAssertEqual(testMessage, error.debugDescription)
+        }
+    }
+    
+    func testAssertGreaterThanExpression() throws {
+        do {
+            try assertGreaterThan({ 5 }, { 4 })
+        } catch {
+            XCTFail("Did not expect a throw")
+            return
+        }
+        
+        do {
+            try assertGreaterThan({ 4 }, { 5 })
+            XCTFail("Expected a throw")
+        } catch {
+            guard let error = error as? Fail else {
+                XCTFail("Expected a `Fail` error")
+                return
+            }
+            
+            XCTAssertEqual("4 is not greater than 5", error.debugDescription)
+        }
+        
+        do {
+            try assertGreaterThan({ 4 }, { 4 })
+            XCTFail("Expected a throw")
+        } catch {
+            guard let error = error as? Fail else {
+                XCTFail("Expected a `Fail` error")
+                return
+            }
+            
+            XCTAssertEqual("4 is not greater than 4", error.debugDescription)
+        }
+        
+        let testMessage = "Test Message"
+        
+        do {
+            try assertGreaterThan(
+                { 4 }, { 5 },
+                { testMessage }()
+            )
+            XCTFail("Expected a throw")
+        } catch {
+            guard let error = error as? Fail else {
+                XCTFail("Expected a `Fail` error")
+                return
+            }
+            
+            XCTAssertEqual(testMessage, error.debugDescription)
+        }
+        
+        let testError = TestError()
+        
+        do {
+            try assertGreaterThan(
+                { 4 }, { throw testError },
+                { testMessage }()
+            )
+            XCTFail("Expected a throw")
+        } catch {
+            guard let error = error as? TestError else {
+                XCTFail("Expected a `Fail` error")
+                return
+            }
+            
+            XCTAssertEqual(testError, error)
+        }
+    }
+    
+    func testAssertGreaterThanOrEqual() throws {
+        do {
+            try assertGreaterThanOrEqual(5, 4)
+        } catch {
+            XCTFail("Did not expect a throw")
+            return
+        }
+        
+        do {
+            try assertGreaterThanOrEqual(4, 4)
+        } catch {
+            XCTFail("Did not expect a throw")
+            return
+        }
+        
+        do {
+            try assertGreaterThanOrEqual(4, 5)
+            XCTFail("Expected a throw")
+        } catch {
+            guard let error = error as? Fail else {
+                XCTFail("Expected a `Fail` error")
+                return
+            }
+            
+            XCTAssertEqual("4 is not greater than or equal to 5", error.debugDescription)
+        }
+        
+        let testMessage = "Test Message"
+        
+        do {
+            try assertGreaterThanOrEqual(
+                4, 5,
+                { testMessage }()
+            )
+            XCTFail("Expected a throw")
+        } catch {
+            guard let error = error as? Fail else {
+                XCTFail("Expected a `Fail` error")
+                return
+            }
+            
+            XCTAssertEqual(testMessage, error.debugDescription)
+        }
+    }
+    
+    func testAssertGreaterThanOrEqualExpression() throws {
+        do {
+            try assertGreaterThanOrEqual({ 5 }, { 4 })
+        } catch {
+            XCTFail("Did not expect a throw")
+            return
+        }
+        
+        do {
+            try assertGreaterThanOrEqual({ 4 }, { 4 })
+        } catch {
+            XCTFail("Did not expect a throw")
+            return
+        }
+        
+        do {
+            try assertGreaterThanOrEqual({ 4 }, { 5 })
+            XCTFail("Expected a throw")
+        } catch {
+            guard let error = error as? Fail else {
+                XCTFail("Expected a `Fail` error")
+                return
+            }
+            
+            XCTAssertEqual("4 is not greater than or equal to 5", error.debugDescription)
+        }
+        
+        let testMessage = "Test Message"
+        
+        do {
+            try assertGreaterThanOrEqual(
+                { 4 }, { 5 },
+                { testMessage }()
+            )
+            XCTFail("Expected a throw")
+        } catch {
+            guard let error = error as? Fail else {
+                XCTFail("Expected a `Fail` error")
+                return
+            }
+            
+            XCTAssertEqual(testMessage, error.debugDescription)
+        }
+        
+        let testError = TestError()
+        
+        do {
+            try assertGreaterThanOrEqual(
+                { 4 }, { throw testError },
+                { testMessage }()
+            )
+            XCTFail("Expected a throw")
+        } catch {
+            guard let error = error as? TestError else {
+                XCTFail("Expected a `Fail` error")
+                return
+            }
+            
+            XCTAssertEqual(testError, error)
+        }
+    }
+    
+    func testAssertLessThan() throws {
+        do {
+            try assertLessThan(4, 5)
+        } catch {
+            XCTFail("Did not expect a throw")
+            return
+        }
+        
+        do {
+            try assertLessThan(5, 4)
+            XCTFail("Expected a throw")
+        } catch {
+            guard let error = error as? Fail else {
+                XCTFail("Expected a `Fail` error")
+                return
+            }
+            
+            XCTAssertEqual("5 is not less than 4", error.debugDescription)
+        }
+        
+        do {
+            try assertLessThan(4, 4)
+            XCTFail("Expected a throw")
+        } catch {
+            guard let error = error as? Fail else {
+                XCTFail("Expected a `Fail` error")
+                return
+            }
+            
+            XCTAssertEqual("4 is not less than 4", error.debugDescription)
+        }
+        
+        let testMessage = "Test Message"
+        
+        do {
+            try assertLessThan(
+                5, 4,
+                { testMessage }()
+            )
+            XCTFail("Expected a throw")
+        } catch {
+            guard let error = error as? Fail else {
+                XCTFail("Expected a `Fail` error")
+                return
+            }
+            
+            XCTAssertEqual(testMessage, error.debugDescription)
+        }
+    }
+    
+    func testAssertLessThanExpression() throws {
+        do {
+            try assertLessThan({ 4 }, { 5 })
+        } catch {
+            XCTFail("Did not expect a throw")
+            return
+        }
+        
+        do {
+            try assertLessThan({ 5 }, { 4 })
+            XCTFail("Expected a throw")
+        } catch {
+            guard let error = error as? Fail else {
+                XCTFail("Expected a `Fail` error")
+                return
+            }
+            
+            XCTAssertEqual("5 is not less than 4", error.debugDescription)
+        }
+        
+        do {
+            try assertLessThan({ 4 }, { 4 })
+            XCTFail("Expected a throw")
+        } catch {
+            guard let error = error as? Fail else {
+                XCTFail("Expected a `Fail` error")
+                return
+            }
+            
+            XCTAssertEqual("4 is not less than 4", error.debugDescription)
+        }
+        
+        let testMessage = "Test Message"
+        
+        do {
+            try assertLessThan(
+                { 5 }, { 4 },
+                { testMessage }()
+            )
+            XCTFail("Expected a throw")
+        } catch {
+            guard let error = error as? Fail else {
+                XCTFail("Expected a `Fail` error")
+                return
+            }
+            
+            XCTAssertEqual(testMessage, error.debugDescription)
+        }
+        
+        let testError = TestError()
+        
+        do {
+            try assertLessThan(
+                { 4 }, { throw testError },
+                { testMessage }()
+            )
+            XCTFail("Expected a throw")
+        } catch {
+            guard let error = error as? TestError else {
+                XCTFail("Expected a `Fail` error")
+                return
+            }
+            
+            XCTAssertEqual(testError, error)
+        }
+    }
+    
+    func testAssertLessThanOrEqual() throws {
+        do {
+            try assertLessThanOrEqual(4, 5)
+        } catch {
+            XCTFail("Did not expect a throw")
+            return
+        }
+        
+        do {
+            try assertLessThanOrEqual(4, 4)
+        } catch {
+            XCTFail("Did not expect a throw")
+            return
+        }
+        
+        do {
+            try assertLessThanOrEqual(5, 4)
+            XCTFail("Expected a throw")
+        } catch {
+            guard let error = error as? Fail else {
+                XCTFail("Expected a `Fail` error")
+                return
+            }
+            
+            XCTAssertEqual("5 is not less than or equal to 4", error.debugDescription)
+        }
+        
+        let testMessage = "Test Message"
+        
+        do {
+            try assertLessThanOrEqual(
+                5, 4,
+                { testMessage }()
+            )
+            XCTFail("Expected a throw")
+        } catch {
+            guard let error = error as? Fail else {
+                XCTFail("Expected a `Fail` error")
+                return
+            }
+            
+            XCTAssertEqual(testMessage, error.debugDescription)
+        }
+    }
+    
+    func testAssertLessThanOrEqualExpression() throws {
+        do {
+            try assertLessThanOrEqual({ 4 }, { 5 })
+        } catch {
+            XCTFail("Did not expect a throw")
+            return
+        }
+        
+        do {
+            try assertLessThanOrEqual({ 4 }, { 4 })
+        } catch {
+            XCTFail("Did not expect a throw")
+            return
+        }
+        
+        do {
+            try assertLessThanOrEqual({ 5 }, { 4 })
+            XCTFail("Expected a throw")
+        } catch {
+            guard let error = error as? Fail else {
+                XCTFail("Expected a `Fail` error")
+                return
+            }
+            
+            XCTAssertEqual("5 is not less than or equal to 4", error.debugDescription)
+        }
+        
+        let testMessage = "Test Message"
+        
+        do {
+            try assertLessThanOrEqual(
+                { 5 }, { 4 },
+                { testMessage }()
+            )
+            XCTFail("Expected a throw")
+        } catch {
+            guard let error = error as? Fail else {
+                XCTFail("Expected a `Fail` error")
+                return
+            }
+            
+            XCTAssertEqual(testMessage, error.debugDescription)
+        }
+        
+        let testError = TestError()
+        
+        do {
+            try assertLessThanOrEqual(
+                { 4 }, { throw testError },
+                { testMessage }()
+            )
+            XCTFail("Expected a throw")
+        } catch {
+            guard let error = error as? TestError else {
+                XCTFail("Expected a `Fail` error")
+                return
+            }
+            
+            XCTAssertEqual(testError, error)
+        }
+    }
 }
