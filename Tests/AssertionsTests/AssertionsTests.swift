@@ -1068,4 +1068,129 @@ final class AssertionsTests: XCTestCase {
             XCTAssertEqual(testError, error)
         }
     }
+    
+    func testAssertIdentical() throws {
+        let object = NSObject()
+        let otherObject = NSObject()
+    
+        do {
+            try assertIdentical(object, object)
+        } catch {
+            XCTFail("Did not expect a throw")
+            return
+        }
+        
+        do {
+            try assertIdentical(object, otherObject)
+            XCTFail("Expected a throw")
+        } catch {
+            guard let error = error as? Fail else {
+                XCTFail("Expected a `Fail` error")
+                return
+            }
+            
+            XCTAssertEqual("\(object) is not identical to \(otherObject)", error.debugDescription)
+        }
+        
+        do {
+            try assertIdentical(nil, otherObject)
+            XCTFail("Expected a throw")
+        } catch {
+            guard let error = error as? Fail else {
+                XCTFail("Expected a `Fail` error")
+                return
+            }
+            
+            XCTAssertEqual("nil is not identical to \(otherObject)", error.debugDescription)
+        }
+        
+        
+        
+        do {
+            try assertIdentical(object, nil)
+            XCTFail("Expected a throw")
+        } catch {
+            guard let error = error as? Fail else {
+                XCTFail("Expected a `Fail` error")
+                return
+            }
+            
+            XCTAssertEqual("\(object) is not identical to nil", error.debugDescription)
+        }
+        
+        let testMessage = "Test Message"
+        
+        do {
+            try assertIdentical(
+                object, otherObject,
+                { testMessage }()
+            )
+            XCTFail("Expected a throw")
+        } catch {
+            guard let error = error as? Fail else {
+                XCTFail("Expected a `Fail` error")
+                return
+            }
+
+            XCTAssertEqual(testMessage, error.debugDescription)
+        }
+    }
+    
+    func testAssertIdenticalExpression() throws {
+        let object = NSObject()
+        let otherObject = NSObject()
+        
+        do {
+            try assertIdentical({ object }, { object })
+        } catch {
+            XCTFail("Did not expect a throw")
+            return
+        }
+        
+        do {
+            try assertIdentical({ object }, { otherObject })
+            XCTFail("Expected a throw")
+        } catch {
+            guard let error = error as? Fail else {
+                XCTFail("Expected a `Fail` error")
+                return
+            }
+            
+            XCTAssertEqual("\(object) is not identical to \(otherObject)", error.debugDescription)
+        }
+        
+        let testMessage = "Test Message"
+        
+        do {
+            try assertIdentical(
+                { object }, { otherObject },
+                { testMessage }()
+            )
+            XCTFail("Expected a throw")
+        } catch {
+            guard let error = error as? Fail else {
+                XCTFail("Expected a `Fail` error")
+                return
+            }
+            
+            XCTAssertEqual(testMessage, error.debugDescription)
+        }
+        
+        let testError = TestError()
+        
+        do {
+            try assertIdentical(
+                { object }, { throw testError },
+                { testMessage }()
+            )
+            XCTFail("Expected a throw")
+        } catch {
+            guard let error = error as? TestError else {
+                XCTFail("Expected a `Fail` error")
+                return
+            }
+            
+            XCTAssertEqual(testError, error)
+        }
+    }
 }

@@ -245,7 +245,7 @@ public func assertIdentical(
     _ message: @autoclosure () -> String? = nil
 ) throws {
     try assert(value1 === value2, {
-        message() ?? "\(String(describing: value1)) is not identical to \(String(describing: value2))"
+        message() ?? "\(value1.map { String(describing: $0) } ?? "nil") is not identical to \(value2.map { String(describing: $0) } ?? "nil")"
     }())
 }
 
