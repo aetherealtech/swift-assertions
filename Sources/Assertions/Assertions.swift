@@ -80,13 +80,13 @@ public func assertEqual<T: Equatable>(
     
     try assert(value1 == value2, {
         let format = DiffFormat.proportional
-        let difference = diff(value1, value2, format: format)
+        let difference = diff(value1, value2, format: format)!
          
         let message =
         """
         \(message() ?? "Values are not equal")
         
-        \(difference ?? "No difference detected")
+        \(difference)
         """
         
         return message
