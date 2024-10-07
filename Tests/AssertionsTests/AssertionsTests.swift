@@ -1193,4 +1193,97 @@ final class AssertionsTests: XCTestCase {
             XCTAssertEqual(testError, error)
         }
     }
+    
+    func testAssertNil() throws {
+        do {
+            try assertNil(nil)
+        } catch {
+            XCTFail("Did not expect a throw")
+            return
+        }
+        
+        do {
+            try assertNil(5)
+            XCTFail("Expected a throw")
+        } catch {
+            guard let error = error as? Fail else {
+                XCTFail("Expected a `Fail` error")
+                return
+            }
+            
+            XCTAssertEqual("5 is not nil", error.debugDescription)
+        }
+        
+        let testMessage = "Test Message"
+        
+        do {
+            try assertNil(
+                5,
+                { testMessage }()
+            )
+            XCTFail("Expected a throw")
+        } catch {
+            guard let error = error as? Fail else {
+                XCTFail("Expected a `Fail` error")
+                return
+            }
+
+            XCTAssertEqual(testMessage, error.debugDescription)
+        }
+    }
+    
+    func testAssertNilExpression() throws {
+        do {
+            try assertNil { nil }
+        } catch {
+            XCTFail("Did not expect a throw")
+            return
+        }
+        
+        do {
+            try assertNil { 5 as Int? }
+            XCTFail("Expected a throw")
+        } catch {
+            guard let error = error as? Fail else {
+                XCTFail("Expected a `Fail` error")
+                return
+            }
+            
+            XCTAssertEqual("5 is not nil", error.debugDescription)
+        }
+        
+        let testMessage = "Test Message"
+        
+        do {
+            try assertNil(
+                { 5 as Int? },
+                { testMessage }()
+            )
+            XCTFail("Expected a throw")
+        } catch {
+            guard let error = error as? Fail else {
+                XCTFail("Expected a `Fail` error")
+                return
+            }
+            
+            XCTAssertEqual(testMessage, error.debugDescription)
+        }
+        
+        let testError = TestError()
+        
+        do {
+            try assertNil(
+                { throw testError },
+                { testMessage }()
+            )
+            XCTFail("Expected a throw")
+        } catch {
+            guard let error = error as? TestError else {
+                XCTFail("Expected a `Fail` error")
+                return
+            }
+            
+            XCTAssertEqual(testError, error)
+        }
+    }
 }
