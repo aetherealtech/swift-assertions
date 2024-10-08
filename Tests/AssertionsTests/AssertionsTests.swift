@@ -403,6 +403,99 @@ final class AssertionsTests: XCTestCase {
         }
     }
     
+    func testAssertNotEqual() throws {
+        do {
+            try assertNotEqual(5, 4)
+        } catch {
+            XCTFail("Did not expect a throw")
+            return
+        }
+                
+        do {
+            try assertNotEqual(5, 5)
+            XCTFail("Expected a throw")
+        } catch {
+            guard let error = error as? Fail else {
+                XCTFail("Expected a `Fail` error")
+                return
+            }
+            
+            XCTAssertEqual("5 is the same as 5", error.debugDescription)
+        }
+        
+        let testMessage = "Test Message"
+        
+        do {
+            try assertNotEqual(
+                5, 5,
+                { testMessage }()
+            )
+            XCTFail("Expected a throw")
+        } catch {
+            guard let error = error as? Fail else {
+                XCTFail("Expected a `Fail` error")
+                return
+            }
+            
+            XCTAssertEqual(testMessage, error.debugDescription)
+        }
+    }
+    
+    func testAssertNotEqualExpression() throws {
+        do {
+            try assertNotEqual({ 5 }, { 4 })
+        } catch {
+            XCTFail("Did not expect a throw")
+            return
+        }
+        
+        do {
+            try assertNotEqual({ 5 }, { 5 })
+            XCTFail("Expected a throw")
+        } catch {
+            guard let error = error as? Fail else {
+                XCTFail("Expected a `Fail` error")
+                return
+            }
+            
+            XCTAssertEqual("5 is the same as 5", error.debugDescription)
+        }
+        
+        let testMessage = "Test Message"
+        
+        do {
+            try assertNotEqual(
+                { 5 }, { 5 },
+                { testMessage }()
+            )
+            XCTFail("Expected a throw")
+        } catch {
+            guard let error = error as? Fail else {
+                XCTFail("Expected a `Fail` error")
+                return
+            }
+            
+            XCTAssertEqual(testMessage, error.debugDescription)
+        }
+        
+        let testError = TestError()
+        
+        do {
+            try assertNotEqual(
+                { 5 }, { throw testError },
+                { testMessage }()
+            )
+            XCTFail("Expected a throw")
+        } catch {
+            guard let error = error as? TestError else {
+                XCTFail("Expected a `Fail` error")
+                return
+            }
+            
+            XCTAssertEqual(testError, error)
+        }
+    }
+    
     func testAssertApproximatelyEqualFloat() throws {
         do {
             try assertEqual(4.0, 4.0, accuracy: 1.0)
@@ -512,6 +605,115 @@ final class AssertionsTests: XCTestCase {
         }
     }
     
+    func testAssertNotApproximatelyEqualFloat() throws {
+        do {
+            try assertNotEqual(4.0, 6.0, accuracy: 1.0)
+        } catch {
+            XCTFail("Did not expect a throw")
+            return
+        }
+        
+        do {
+            try assertNotEqual(4.0, 4.0, accuracy: 1.0)
+            XCTFail("Expected a throw")
+        } catch {
+            guard let error = error as? Fail else {
+                XCTFail("Expected a `Fail` error")
+                return
+            }
+            
+            XCTAssertEqual("""
+            Values are approximately equal
+
+            4.0 == 4.0 +/- 1.0
+            """, error.debugDescription)
+        }
+        
+        let testMessage = "Test Message"
+        
+        do {
+            try assertNotEqual(
+                4.0, 4.0, accuracy: 1.0,
+                { testMessage }()
+            )
+            XCTFail("Expected a throw")
+        } catch {
+            guard let error = error as? Fail else {
+                XCTFail("Expected a `Fail` error")
+                return
+            }
+            
+            XCTAssertEqual("""
+            \(testMessage)
+            
+            4.0 == 4.0 +/- 1.0
+            """, error.debugDescription)
+        }
+    }
+    
+    func testAssertNotApproximatelyEqualFloatExpression() throws {
+        do {
+            try assertNotEqual({ 4.0 }, { 6.0 }, accuracy: 1.0)
+        } catch {
+            XCTFail("Did not expect a throw")
+            return
+        }
+        
+        do {
+            try assertNotEqual({ 4.0 }, { 4.0 }, accuracy: 1.0)
+            XCTFail("Expected a throw")
+        } catch {
+            guard let error = error as? Fail else {
+                XCTFail("Expected a `Fail` error")
+                return
+            }
+            
+            XCTAssertEqual("""
+            Values are approximately equal
+
+            4.0 == 4.0 +/- 1.0
+            """, error.debugDescription)
+        }
+        
+        let testMessage = "Test Message"
+        
+        do {
+            try assertNotEqual(
+                { 4.0 }, { 4.0 }, accuracy: 1.0,
+                { testMessage }()
+            )
+            XCTFail("Expected a throw")
+        } catch {
+            guard let error = error as? Fail else {
+                XCTFail("Expected a `Fail` error")
+                return
+            }
+            
+            XCTAssertEqual("""
+            \(testMessage)
+            
+            4.0 == 4.0 +/- 1.0
+            """, error.debugDescription)
+        }
+        
+        let testError = TestError()
+        
+        do {
+            try assertNotEqual(
+                { 4.0 }, { throw testError }, accuracy: 1.0,
+                { testMessage }()
+            )
+            XCTFail("Expected a throw")
+        } catch {
+            guard let error = error as? TestError else {
+                XCTFail("Expected a `Fail` error")
+                return
+            }
+            
+            XCTAssertEqual(testError, error)
+        }
+    }
+    
     func testAssertApproximatelyEqualNumeric() throws {
         do {
             try assertEqual(4, 4, accuracy: 1)
@@ -607,6 +809,115 @@ final class AssertionsTests: XCTestCase {
         
         do {
             try assertEqual(
+                { 4 }, { throw testError }, accuracy: 1,
+                { testMessage }()
+            )
+            XCTFail("Expected a throw")
+        } catch {
+            guard let error = error as? TestError else {
+                XCTFail("Expected a `Fail` error")
+                return
+            }
+            
+            XCTAssertEqual(testError, error)
+        }
+    }
+    
+    func testAssertNotApproximatelyEqualNumeric() throws {
+        do {
+            try assertNotEqual(4, 6, accuracy: 1)
+        } catch {
+            XCTFail("Did not expect a throw")
+            return
+        }
+        
+        do {
+            try assertNotEqual(4, 4, accuracy: 1)
+            XCTFail("Expected a throw")
+        } catch {
+            guard let error = error as? Fail else {
+                XCTFail("Expected a `Fail` error")
+                return
+            }
+            
+            XCTAssertEqual("""
+            Values are approximately equal
+
+            4 == 4 +/- 1
+            """, error.debugDescription)
+        }
+        
+        let testMessage = "Test Message"
+        
+        do {
+            try assertNotEqual(
+                4, 4, accuracy: 1,
+                { testMessage }()
+            )
+            XCTFail("Expected a throw")
+        } catch {
+            guard let error = error as? Fail else {
+                XCTFail("Expected a `Fail` error")
+                return
+            }
+            
+            XCTAssertEqual("""
+            \(testMessage)
+            
+            4 == 4 +/- 1
+            """, error.debugDescription)
+        }
+    }
+    
+    func testAssertNotApproximatelyEqualNumericExpression() throws {
+        do {
+            try assertNotEqual({ 4 }, { 6 }, accuracy: 1)
+        } catch {
+            XCTFail("Did not expect a throw")
+            return
+        }
+        
+        do {
+            try assertNotEqual({ 4 }, { 4 }, accuracy: 1)
+            XCTFail("Expected a throw")
+        } catch {
+            guard let error = error as? Fail else {
+                XCTFail("Expected a `Fail` error")
+                return
+            }
+            
+            XCTAssertEqual("""
+            Values are approximately equal
+
+            4 == 4 +/- 1
+            """, error.debugDescription)
+        }
+        
+        let testMessage = "Test Message"
+        
+        do {
+            try assertNotEqual(
+                { 4 }, { 4 }, accuracy: 1,
+                { testMessage }()
+            )
+            XCTFail("Expected a throw")
+        } catch {
+            guard let error = error as? Fail else {
+                XCTFail("Expected a `Fail` error")
+                return
+            }
+            
+            XCTAssertEqual("""
+            \(testMessage)
+            
+            4 == 4 +/- 1
+            """, error.debugDescription)
+        }
+        
+        let testError = TestError()
+        
+        do {
+            try assertNotEqual(
                 { 4 }, { throw testError }, accuracy: 1,
                 { testMessage }()
             )
@@ -1194,6 +1505,117 @@ final class AssertionsTests: XCTestCase {
         }
     }
     
+    func testAssertNotIdentical() throws {
+        let object = NSObject()
+        let otherObject = NSObject()
+    
+        do {
+            try assertNotIdentical(object, otherObject)
+        } catch {
+            XCTFail("Did not expect a throw")
+            return
+        }
+        
+        do {
+            try assertNotIdentical(object, object)
+            XCTFail("Expected a throw")
+        } catch {
+            guard let error = error as? Fail else {
+                XCTFail("Expected a `Fail` error")
+                return
+            }
+            
+            XCTAssertEqual("\(object) is identical to \(object)", error.debugDescription)
+        }
+        
+        do {
+            try assertNotIdentical(nil, nil)
+            XCTFail("Expected a throw")
+        } catch {
+            guard let error = error as? Fail else {
+                XCTFail("Expected a `Fail` error")
+                return
+            }
+            
+            XCTAssertEqual("nil is identical to nil", error.debugDescription)
+        }
+        
+        let testMessage = "Test Message"
+        
+        do {
+            try assertNotIdentical(
+                object, object,
+                { testMessage }()
+            )
+            XCTFail("Expected a throw")
+        } catch {
+            guard let error = error as? Fail else {
+                XCTFail("Expected a `Fail` error")
+                return
+            }
+
+            XCTAssertEqual(testMessage, error.debugDescription)
+        }
+    }
+    
+    func testAssertNotIdenticalExpression() throws {
+        let object = NSObject()
+        let otherObject = NSObject()
+        
+        do {
+            try assertNotIdentical({ object }, { otherObject })
+        } catch {
+            XCTFail("Did not expect a throw")
+            return
+        }
+        
+        do {
+            try assertNotIdentical({ object }, { object })
+            XCTFail("Expected a throw")
+        } catch {
+            guard let error = error as? Fail else {
+                XCTFail("Expected a `Fail` error")
+                return
+            }
+            
+            XCTAssertEqual("\(object) is identical to \(object)", error.debugDescription)
+        }
+        
+        let testMessage = "Test Message"
+        
+        do {
+            try assertNotIdentical(
+                { object }, { object },
+                { testMessage }()
+            )
+            XCTFail("Expected a throw")
+        } catch {
+            guard let error = error as? Fail else {
+                XCTFail("Expected a `Fail` error")
+                return
+            }
+            
+            XCTAssertEqual(testMessage, error.debugDescription)
+        }
+        
+        let testError = TestError()
+        
+        do {
+            try assertNotIdentical(
+                { object }, { throw testError },
+                { testMessage }()
+            )
+            XCTFail("Expected a throw")
+        } catch {
+            guard let error = error as? TestError else {
+                XCTFail("Expected a `Fail` error")
+                return
+            }
+            
+            XCTAssertEqual(testError, error)
+        }
+    }
+    
     func testAssertNil() throws {
         do {
             try assertNil(nil)
@@ -1284,6 +1706,139 @@ final class AssertionsTests: XCTestCase {
             }
             
             XCTAssertEqual(testError, error)
+        }
+    }
+    
+    func testAssertNotNil() throws {
+        do {
+            try assertNotNil(5)
+        } catch {
+            XCTFail("Did not expect a throw")
+            return
+        }
+        
+        do {
+            try assertNotNil(nil)
+            XCTFail("Expected a throw")
+        } catch {
+            guard let error = error as? Fail else {
+                XCTFail("Expected a `Fail` error")
+                return
+            }
+            
+            XCTAssertEqual("Value is nil", error.debugDescription)
+        }
+        
+        let testMessage = "Test Message"
+        
+        do {
+            try assertNotNil(
+                nil,
+                { testMessage }()
+            )
+            XCTFail("Expected a throw")
+        } catch {
+            guard let error = error as? Fail else {
+                XCTFail("Expected a `Fail` error")
+                return
+            }
+
+            XCTAssertEqual(testMessage, error.debugDescription)
+        }
+    }
+    
+    func testAssertNotNilExpression() throws {
+        do {
+            try assertNotNil { 5 as Int? }
+        } catch {
+            XCTFail("Did not expect a throw")
+            return
+        }
+        
+        do {
+            try assertNotNil { nil }
+            XCTFail("Expected a throw")
+        } catch {
+            guard let error = error as? Fail else {
+                XCTFail("Expected a `Fail` error")
+                return
+            }
+            
+            XCTAssertEqual("Value is nil", error.debugDescription)
+        }
+        
+        let testMessage = "Test Message"
+        
+        do {
+            try assertNotNil(
+                { nil },
+                { testMessage }()
+            )
+            XCTFail("Expected a throw")
+        } catch {
+            guard let error = error as? Fail else {
+                XCTFail("Expected a `Fail` error")
+                return
+            }
+            
+            XCTAssertEqual(testMessage, error.debugDescription)
+        }
+        
+        let testError = TestError()
+        
+        do {
+            try assertNotNil(
+                { throw testError },
+                { testMessage }()
+            )
+            XCTFail("Expected a throw")
+        } catch {
+            guard let error = error as? TestError else {
+                XCTFail("Expected a `Fail` error")
+                return
+            }
+            
+            XCTAssertEqual(testError, error)
+        }
+    }
+    
+    func testAssertNoThrow() throws {
+        do {
+            try assertNoThrow { }
+        } catch {
+            XCTFail("Did not expect a throw")
+            return
+        }
+        
+        let testError = TestError()
+        
+        do {
+            try assertNoThrow { throw testError }
+            XCTFail("Expected a throw")
+        } catch {
+            guard let error = error as? Fail else {
+                XCTFail("Expected a `Fail` error")
+                return
+            }
+            
+            XCTAssertEqual("Expression threw error: \(testError)", error.debugDescription)
+        }
+        
+        let testMessage = "Test Message"
+        
+        do {
+            try assertNoThrow(
+                { throw testError },
+                { testMessage }()
+            )
+            XCTFail("Expected a throw")
+        } catch {
+            guard let error = error as? Fail else {
+                XCTFail("Expected a `Fail` error")
+                return
+            }
+            
+            XCTAssertEqual(testMessage, error.debugDescription)
         }
     }
 }

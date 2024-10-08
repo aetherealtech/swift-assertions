@@ -93,6 +93,28 @@ public func assertEqual<T: Equatable>(
     }())
 }
 
+public func assertNotEqual<T: Equatable>(
+    _ value1: T,
+    _ value2: T,
+    _ message: @autoclosure () -> String? = nil
+) throws {
+    try assert(value1 != value2, {
+        message() ?? "\(value1) is the same as \(value2)"
+    }())
+}
+
+public func assertNotEqual<T: Equatable>(
+    _ expression1: () throws -> T,
+    _ expression2: () throws -> T,
+    _ message: @autoclosure () -> String? = nil
+) throws {
+    try assertNotEqual(
+        expression1(),
+        expression2(),
+        message()
+    )
+}
+
 public func assertEqual<T: FloatingPoint>(
     _ value1: T,
     _ value2: T,
@@ -122,6 +144,35 @@ public func assertEqual<T: FloatingPoint>(
     )
 }
 
+public func assertNotEqual<T: FloatingPoint>(
+    _ value1: T,
+    _ value2: T,
+    accuracy: T,
+    _ message: @autoclosure () -> String? = nil
+) throws {
+    try assert(abs(value1 - value2) > accuracy, {
+        """
+        \(message() ?? "Values are approximately equal")
+        
+        \(value1) == \(value2) +/- \(accuracy)
+        """
+    }())
+}
+
+public func assertNotEqual<T: FloatingPoint>(
+    _ expression1: () throws -> T,
+    _ expression2: () throws -> T,
+    accuracy: T,
+    _ message: @autoclosure () -> String? = nil
+) throws {
+    try assertNotEqual(
+        expression1(),
+        expression2(),
+        accuracy: accuracy,
+        message()
+    )
+}
+
 public func assertEqual<T: Numeric>(
     _ value1: T,
     _ value2: T,
@@ -144,6 +195,35 @@ public func assertEqual<T: Numeric>(
     _ message: @autoclosure () -> String? = nil
 ) throws {
     try assertEqual(
+        expression1(),
+        expression2(),
+        accuracy: accuracy,
+        message()
+    )
+}
+
+public func assertNotEqual<T: Numeric>(
+    _ value1: T,
+    _ value2: T,
+    accuracy: T,
+    _ message: @autoclosure () -> String? = nil
+) throws {
+    try assert((value1 - value2).magnitude > accuracy.magnitude, {
+        """
+        \(message() ?? "Values are approximately equal")
+        
+        \(value1) == \(value2) +/- \(accuracy)
+        """
+    }())
+}
+
+public func assertNotEqual<T: Numeric>(
+    _ expression1: () throws -> T,
+    _ expression2: () throws -> T,
+    accuracy: T,
+    _ message: @autoclosure () -> String? = nil
+) throws {
+    try assertNotEqual(
         expression1(),
         expression2(),
         accuracy: accuracy,
@@ -261,124 +341,13 @@ public func assertIdentical(
     )
 }
 
-public func assertNil(
-    _ expression: Any?,
-    _ message: @autoclosure () -> String? = nil
-) throws {
-    try assert(expression == nil, {
-        message() ?? "\(expression!) is not nil"
-    }())
-}
-
-public func assertNil(
-    _ expression: () throws -> Any?,
-    _ message: @autoclosure () -> String? = nil
-) throws {
-    try assertNil(
-        expression(),
-        message()
-    )
-}
-
-@discardableResult
-public func assertNoThrow<T>(
-    _ expression: () throws -> T,
-    _ message: @autoclosure () -> String? = nil
-) throws -> T {
-    do {
-        return try expression()
-    } catch {
-        throw Fail(message() ?? "Expression threw error: \(error)")
-    }
-}
-
-public func assertNotEqual<T: Equatable>(
-    _ value1: T,
-    _ value2: T,
-    _ message: @autoclosure () -> String? = nil
-) throws {
-    try assert(value1 != value2, {
-        message() ?? "\(value1) is the same as \(value2)"
-    }())
-}
-
-public func assertNotEqual<T: Equatable>(
-    _ expression1: () throws -> T,
-    _ expression2: () throws -> T,
-    _ message: @autoclosure () -> String? = nil
-) throws {
-    try assertNotEqual(
-        expression1(),
-        expression2(),
-        message()
-    )
-}
-
-public func assertNotEqual<T: FloatingPoint>(
-    _ value1: T,
-    _ value2: T,
-    accuracy: T,
-    _ message: @autoclosure () -> String? = nil
-) throws {
-    try assert(abs(value1 - value2) > accuracy, {
-        """
-        \(message() ?? "Values are approximately equal")
-        
-        \(value1) == \(value2) +/- \(accuracy)
-        """
-    }())
-}
-
-public func assertNotEqual<T: FloatingPoint>(
-    _ expression1: () throws -> T,
-    _ expression2: () throws -> T,
-    accuracy: T,
-    _ message: @autoclosure () -> String? = nil
-) throws {
-    try assertNotEqual(
-        expression1(),
-        expression2(),
-        accuracy: accuracy,
-        message()
-    )
-}
-
-public func assertNotEqual<T: Numeric>(
-    _ value1: T,
-    _ value2: T,
-    accuracy: T,
-    _ message: @autoclosure () -> String? = nil
-) throws {
-    try assert((value1 - value2).magnitude > accuracy.magnitude, {
-        """
-        \(message() ?? "Values are approximately equal")
-        
-        \(value1) == \(value2) +/- \(accuracy)
-        """
-    }())
-}
-
-public func assertNotEqual<T: Numeric>(
-    _ expression1: () throws -> T,
-    _ expression2: () throws -> T,
-    accuracy: T,
-    _ message: @autoclosure () -> String? = nil
-) throws {
-    try assertNotEqual(
-        expression1(),
-        expression2(),
-        accuracy: accuracy,
-        message()
-    )
-}
-
 public func assertNotIdentical(
     _ value1: AnyObject?,
     _ value2: AnyObject?,
     _ message: @autoclosure () -> String? = nil
 ) throws {
     try assert(value1 !== value2, {
-        message() ?? "\(String(describing: value1)) is identical to \(String(describing: value2))"
+        message() ?? "\(value1.map { String(describing: $0) } ?? "nil") is identical to \(value2.map { String(describing: $0) } ?? "nil")"
     }())
 }
 
@@ -394,12 +363,31 @@ public func assertNotIdentical(
     )
 }
 
-public func assertNotNil(
-    _ expression: Any?,
+public func assertNil(
+    _ value: Any?,
     _ message: @autoclosure () -> String? = nil
 ) throws {
-    try assert(expression != nil, {
-        message() ?? "\(expression!) is nil"
+    try assert(value == nil, {
+        message() ?? "\(value!) is not nil"
+    }())
+}
+
+public func assertNil(
+    _ expression: () throws -> Any?,
+    _ message: @autoclosure () -> String? = nil
+) throws {
+    try assertNil(
+        expression(),
+        message()
+    )
+}
+
+public func assertNotNil(
+    _ value: Any?,
+    _ message: @autoclosure () -> String? = nil
+) throws {
+    try assert(value != nil, {
+        message() ?? "Value is nil"
     }())
 }
 
@@ -411,6 +399,18 @@ public func assertNotNil(
         expression(),
         message()
     )
+}
+
+@discardableResult
+public func assertNoThrow<T>(
+    _ expression: () throws -> T,
+    _ message: @autoclosure () -> String? = nil
+) throws -> T {
+    do {
+        return try expression()
+    } catch {
+        throw Fail(message() ?? "Expression threw error: \(error)")
+    }
 }
 
 public func assertThrowsError<T>(
