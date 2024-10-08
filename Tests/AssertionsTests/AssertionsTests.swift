@@ -3,7 +3,7 @@ import XCTest
 @testable import Assertions
 
 struct TestError: Error, Equatable {
-    let payload = Int.random(in: 0..<100)
+    var payload = Int.random(in: 0..<100)
 }
 
 struct TestStruct: Equatable {
@@ -1803,8 +1803,11 @@ final class AssertionsTests: XCTestCase {
     }
     
     func testAssertNoThrow() throws {
+        let expectedResult = Int.random(in: 0..<100)
+        
         do {
-            try assertNoThrow { }
+            let result = try assertNoThrow { expectedResult }
+            XCTAssertEqual(expectedResult, result)
         } catch {
             XCTFail("Did not expect a throw")
             return
@@ -1829,6 +1832,246 @@ final class AssertionsTests: XCTestCase {
         do {
             try assertNoThrow(
                 { throw testError },
+                { testMessage }()
+            )
+            XCTFail("Expected a throw")
+        } catch {
+            guard let error = error as? Fail else {
+                XCTFail("Expected a `Fail` error")
+                return
+            }
+            
+            XCTAssertEqual(testMessage, error.debugDescription)
+        }
+    }
+    
+    func testAssertThrowsError() throws {
+        let testError = TestError()
+        
+        do {
+            var handledError: (any Error)? = nil
+            
+            try assertThrowsError {
+                throw testError
+            } errorHandler: { error in
+                handledError = error
+            }
+            
+            XCTAssertEqual(handledError as? TestError, testError)
+        } catch {
+            XCTFail("Did not expect a throw")
+            return
+        }
+        
+        do {
+            try assertThrowsError {
+                throw testError
+            }
+        } catch {
+            XCTFail("Did not expect a throw")
+            return
+        }
+        
+        do {
+            try assertThrowsError { 5 }
+            XCTFail("Expected a throw")
+        } catch {
+            guard let error = error as? Fail else {
+                XCTFail("Expected a `Fail` error")
+                return
+            }
+            
+            XCTAssertEqual("Expression did not throw an error", error.debugDescription)
+        }
+        
+        let testMessage = "Test Message"
+        
+        do {
+            try assertThrowsError(
+                { "" },
+                { testMessage }()
+            )
+            XCTFail("Expected a throw")
+        } catch {
+            guard let error = error as? Fail else {
+                XCTFail("Expected a `Fail` error")
+                return
+            }
+            
+            XCTAssertEqual(testMessage, error.debugDescription)
+        }
+    }
+    
+    func testAssertThrowsExpectedError() throws {
+        let testError = TestError()
+        let otherError = TestError(payload: testError.payload + 1)
+        
+        do {
+            try assertThrowsError(expectedError: testError) {
+                throw testError
+            }
+        } catch {
+            XCTFail("Did not expect a throw")
+            return
+        }
+        
+        do {
+            try assertThrowsError(expectedError: testError) {
+                throw otherError
+            }
+            XCTFail("Expected a throw")
+        } catch {
+            guard let error = error as? Fail else {
+                XCTFail("Expected a `Fail` error")
+                return
+            }
+            
+            XCTAssertEqual("""
+            Values are not equal
+
+            − TestError(payload: \(otherError.payload))
+            + TestError(payload: \(testError.payload))
+            """, error.debugDescription)
+        }
+        
+        do {
+            try assertThrowsError(expectedError: testError) { 5 }
+            XCTFail("Expected a throw")
+        } catch {
+            guard let error = error as? Fail else {
+                XCTFail("Expected a `Fail` error")
+                return
+            }
+            
+            XCTAssertEqual("Expression did not throw an error", error.debugDescription)
+        }
+        
+        let testMessage = "Test Message"
+        
+        do {
+            try assertThrowsError(
+                expectedError: testError,
+                { "" },
+                { testMessage }()
+            )
+            XCTFail("Expected a throw")
+        } catch {
+            guard let error = error as? Fail else {
+                XCTFail("Expected a `Fail` error")
+                return
+            }
+            
+            XCTAssertEqual(testMessage, error.debugDescription)
+        }
+    }
+    
+    func testAssertThrowsErrorAsync() async throws {
+        let testError = TestError()
+        
+        do {
+            var handledError: (any Error)? = nil
+            
+            try await assertThrowsError { () async throws in
+                throw testError
+            } errorHandler: { error async in
+                handledError = error
+            }
+            
+            XCTAssertEqual(handledError as? TestError, testError)
+        } catch {
+            XCTFail("Did not expect a throw")
+            return
+        }
+        
+        do {
+            try await assertThrowsError { () async throws in
+                throw testError
+            }
+        } catch {
+            XCTFail("Did not expect a throw")
+            return
+        }
+        
+        do {
+            try await assertThrowsError { () async throws in 5 }
+            XCTFail("Expected a throw")
+        } catch {
+            guard let error = error as? Fail else {
+                XCTFail("Expected a `Fail` error")
+                return
+            }
+            
+            XCTAssertEqual("Expression did not throw an error", error.debugDescription)
+        }
+        
+        let testMessage = "Test Message"
+        
+        do {
+            try await assertThrowsError(
+                { () async throws in "" },
+                { testMessage }()
+            )
+            XCTFail("Expected a throw")
+        } catch {
+            guard let error = error as? Fail else {
+                XCTFail("Expected a `Fail` error")
+                return
+            }
+            
+            XCTAssertEqual(testMessage, error.debugDescription)
+        }
+    }
+    
+    func testAssertThrowsExpectedErrorAsync() async throws {
+        let testError = TestError()
+        let otherError = TestError(payload: testError.payload + 1)
+        
+        do {
+            try await assertThrowsError(expectedError: testError) { () async throws in
+                throw testError
+            }
+        } catch {
+            XCTFail("Did not expect a throw")
+            return
+        }
+        
+        do {
+            try await assertThrowsError(expectedError: testError) { () async throws in
+                throw otherError
+            }
+            XCTFail("Expected a throw")
+        } catch {
+            guard let error = error as? Fail else {
+                XCTFail("Expected a `Fail` error")
+                return
+            }
+            
+            XCTAssertEqual("""
+            Values are not equal
+
+            − TestError(payload: \(otherError.payload))
+            + TestError(payload: \(testError.payload))
+            """, error.debugDescription)
+        }
+        
+        do {
+            try await assertThrowsError(expectedError: testError) { () async throws in 5 }
+            XCTFail("Expected a throw")
+        } catch {
+            guard let error = error as? Fail else {
+                XCTFail("Expected a `Fail` error")
+                return
+            }
+            
+            XCTAssertEqual("Expression did not throw an error", error.debugDescription)
+        }
+        
+        let testMessage = "Test Message"
+        
+        do {
+            try await assertThrowsError(
+                expectedError: testError,
+                { () async throws in "" },
                 { testMessage }()
             )
             XCTFail("Expected a throw")
